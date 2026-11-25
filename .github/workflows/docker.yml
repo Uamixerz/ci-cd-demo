@@ -28,10 +28,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # GHCR accepts lowercase names only, and the account name has an uppercase letter.
+      - name: Image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
       - name: Build & Push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          tags: ${{ steps.image.outputs.name }}:sha-${{ github.sha }}
